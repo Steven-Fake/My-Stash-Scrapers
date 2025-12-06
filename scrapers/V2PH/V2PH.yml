@@ -1,0 +1,10 @@
+name: GalleryEpic
+
+performerByURL:
+  - action: script
+    url:
+      - v2ph.com/actor
+    script:
+      - python
+      - V2PH.py
+      - performerByURL
