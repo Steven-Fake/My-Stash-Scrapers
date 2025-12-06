@@ -7,7 +7,7 @@
 # index.yml
 # <scraper_id>.zip
 # Each zip file contains the scraper.yml file and any other files in the same directory
-shopt -s nullglob
+
 outdir="$1"
 if [ -z "$outdir" ]; then
     outdir="_site"

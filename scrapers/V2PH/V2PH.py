@@ -70,7 +70,6 @@ def parse_performer_by_url(url_info: dict):
 
 if __name__ == "__main__":
     info = json.loads(sys.stdin.read())
-    
     if sys.argv[1] == "performerByURL":
         result = parse_performer_by_url(info)
         print(json.dumps(result, ensure_ascii=False))
