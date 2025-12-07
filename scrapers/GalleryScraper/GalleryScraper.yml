@@ -1,0 +1,14 @@
+name: GalleryScraper
+
+performerByURL:
+  - action: script
+    url:
+      - galleryepic.com/en/coser
+      - galleryepic.com/zh/coser
+      - v2ph.com/actor
+      - xchina.co/model
+      - xchina.fit/model
+    script:
+      - python
+      - main.py
+      - performerByURL
