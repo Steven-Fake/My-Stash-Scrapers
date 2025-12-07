@@ -1,10 +1,13 @@
 import re
-from typing import Optional
+import sys
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString, Tag
 
-from schemas import PerformerByURLInput, PerformerByURLOutput
+from py_common import log
+from py_common.types import ScrapedPerformer, PerformerSearchResult
+from utils import jaccard_similarity
 from .base import BaseGalleryScraper
 
 
@@ -14,20 +17,22 @@ class V2PH(BaseGalleryScraper):
     def __init__(self):
         super().__init__(base_url="https://v2ph.com", http_client="cloudscraper")
 
-    def parse_performer_by_url(self, url_info: PerformerByURLInput) -> PerformerByURLOutput:
+    def parse_performer_by_url(self, info: PerformerSearchResult) -> ScrapedPerformer:
         resp = self.client.get(
-            url=url_info.get("url"),
+            url=info.get("url"),
             headers={'accept-language': 'zh-CN,zh;q=0.9'},
             proxies=self.proxies
         )
         if resp.status_code != 200:
-            self._logger.error("Failed to retrieve URL")
+            log.error("Failed to retrieve URL")
+            sys.exit(-1)
 
         soup = BeautifulSoup(resp.content, "html.parser")
 
         info_elem = soup.select_one("div.row.card-body")
         if not info_elem:
-            self._logger.error("No performer info found")
+            log.error("No performer info found")
+            sys.exit(-1)
 
         name_elem = info_elem.select_one("h1")
         raw_name = name_elem.text.strip() if name_elem else ""
@@ -38,7 +43,7 @@ class V2PH(BaseGalleryScraper):
             name, aliases = raw_name, []
 
         image_elem = info_elem.select_one("img")
-        image_url: Optional[str] = image_elem['src'] if image_elem else None
+        image_url = image_elem['src'] if image_elem else None
 
         keys = [elem.text.strip() for elem in info_elem.select("dt")]
         values = [elem.text.strip() for elem in info_elem.select("dd")]
@@ -48,6 +53,7 @@ class V2PH(BaseGalleryScraper):
         measurements = re.sub(r"\s+", "", info_map["三围"]) if info_map.get("三围") else None
 
         urls = [link_elem['href'] for link_elem in info_elem.find_all("a")]
+        urls.insert(0, info.get("url"))
 
         last_child_elem = [i for i in info_elem.contents if isinstance(i, Tag)][-1]
         for string_elem in reversed(last_child_elem.contents):
@@ -57,7 +63,7 @@ class V2PH(BaseGalleryScraper):
         else:
             last_text = ""
 
-        return PerformerByURLOutput(
+        return ScrapedPerformer(
             name=name,
             aliases=", ".join(aliases),
             image=image_url,
@@ -67,3 +73,32 @@ class V2PH(BaseGalleryScraper):
             urls=urls,
             details=last_text
         )
+
+    async def parse_performer_by_name(self, info: PerformerSearchResult) -> list[PerformerSearchResult]:
+        name = info.get("name", "")
+        resp = self.client.get(
+            url=f"https://www.v2ph.com/search/?q={name}",
+            headers={'accept-language': 'zh-CN,zh;q=0.9'},
+            proxies=self.proxies
+        )
+        if resp.status_code != 200:
+            log.error("Failed to retrieve search results")
+            sys.exit(-1)
+
+        soup = BeautifulSoup(resp.content, "html.parser")
+
+        result_elem = soup.select_one("div.container.main-wrap")
+        if not result_elem:
+            return []
+
+        seen_urls: set[str] = set()
+        performers: list[PerformerSearchResult] = []
+        for url_elem in result_elem.select('a[href^="/actor"]'):
+            url = urljoin(self.base_url, url_elem["href"])
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            performers.append(PerformerSearchResult(url=url, name=url_elem.text.strip()))
+        performers.sort(key=lambda p: jaccard_similarity(p.get("name", ""), name), reverse=True)
+
+        return performers

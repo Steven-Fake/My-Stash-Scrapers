@@ -1,28 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Sequence, Literal
-import requests
-import cloudscraper
 from urllib.request import getproxies
-import sys
 
-from schemas import PerformerByURLInput, PerformerByURLOutput
+import cloudscraper
+import requests
 
-
-class Logger:
-
-    def __init__(self, name: str):
-        self.name = name
-
-    @property
-    def logger_name(self) -> str:
-        return self.name
-
-    def error(self, message: str):
-        sys.stderr.write(f"[{self.logger_name}] ERROR: {message}\n")
-        sys.exit(-1)
-
-    def warning(self, message: str):
-        sys.stderr.write(f"[{self.logger_name}] WARNING: {message}\n")
+from py_common.types import ScrapedPerformer, PerformerSearchResult
 
 
 class BaseGalleryScraper(ABC):
@@ -30,7 +13,6 @@ class BaseGalleryScraper(ABC):
 
     def __init__(self, base_url: str, http_client: Literal["requests", "cloudscraper"] = "requests"):
         self.base_url = base_url
-        self._logger = Logger(f"{self.__class__.__name__} Scraper")
 
         if http_client == "requests":
             self.client: requests.Session | cloudscraper.CloudScraper = requests.Session()
@@ -48,5 +30,9 @@ class BaseGalleryScraper(ABC):
         return getproxies()
 
     @abstractmethod
-    def parse_performer_by_url(self, url_info: PerformerByURLInput) -> PerformerByURLOutput:
+    def parse_performer_by_url(self, info: PerformerSearchResult) -> ScrapedPerformer:
+        pass
+
+    @abstractmethod
+    async def parse_performer_by_name(self, info: PerformerSearchResult) -> PerformerSearchResult:
         pass

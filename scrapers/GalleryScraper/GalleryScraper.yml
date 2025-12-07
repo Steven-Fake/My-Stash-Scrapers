@@ -12,3 +12,10 @@ performerByURL:
       - python
       - main.py
       - performerByURL
+
+performerByName:
+  action: script
+  script:
+    - python
+    - main.py
+    - performerByName
