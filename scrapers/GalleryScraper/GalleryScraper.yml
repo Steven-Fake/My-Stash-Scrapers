@@ -21,11 +21,11 @@ performerByName:
     - performerByName
 
 galleryByURL:
-    action: script
+  - action: script
     url:
-        - xchina.co/photo
-        - xchina.fit/photo
+      - xchina.co/photo
+      - xchina.fit/photo
     script:
-        - python
-        - main.py
-        - galleryByURL
+      - python
+      - main.py
+      - galleryByURL
