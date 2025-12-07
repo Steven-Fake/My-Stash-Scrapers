@@ -1,9 +1,8 @@
-import sys
+from typing import Literal
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from py_common import log
 from py_common.types import ScrapedPerformer, PerformerSearchResult
 from utils import jaccard_similarity
 from .base import BaseGalleryScraper
@@ -15,12 +14,8 @@ class GalleryEpic(BaseGalleryScraper):
     def __init__(self):
         super().__init__(base_url="https://galleryepic.com")
 
-    def parse_performer_by_url(self, info: PerformerSearchResult) -> ScrapedPerformer:
-        resp = self.client.get(url=info.get("url"), proxies=self.proxies)
-        if resp.status_code != 200:
-            log.error("Failed to retrieve URL")
-            sys.exit(-1)
-
+    def parse_performer_by_url(self, info: dict[Literal["url"], str]) -> ScrapedPerformer:
+        resp = self.fetch("get", url=info.get("url"))
         soup = BeautifulSoup(resp.content, "html.parser")
 
         name_elem = soup.select_one("h4.scroll-m-20.text-xl.font-semibold.tracking-tight")
@@ -42,13 +37,9 @@ class GalleryEpic(BaseGalleryScraper):
             image=avatar_url
         )
 
-    async def parse_performer_by_name(self, info: PerformerSearchResult) -> list[PerformerSearchResult]:
-        name = info.get("name", "")
-        resp = self.client.get(url=f"https://galleryepic.com/zh/cosers/1?coserName={name}", proxies=self.proxies)
-        if resp.status_code != 200:
-            log.error("Failed to retrieve search results")
-            sys.exit(-1)
-
+    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
+        name = info.get("name")
+        resp = self.fetch("get", url=f"https://galleryepic.com/zh/cosers/1?coserName={name}")
         soup = BeautifulSoup(resp.content, "html.parser")
 
         result_elem = soup.select_one("div.grid.grid-cols-2")

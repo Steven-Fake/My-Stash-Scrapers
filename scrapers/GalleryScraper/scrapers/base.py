@@ -1,10 +1,12 @@
+import sys
 from abc import ABC, abstractmethod
-from typing import Sequence, Literal
+from typing import Any, Sequence, Literal
 from urllib.request import getproxies
 
 import cloudscraper
 import requests
 
+from py_common import log
 from py_common.types import ScrapedPerformer, PerformerSearchResult
 
 
@@ -29,10 +31,25 @@ class BaseGalleryScraper(ABC):
     def proxies(self) -> dict:
         return getproxies()
 
+    def fetch(
+            self,
+            method: Literal["get", "post"],
+            url: str,
+            *args: Any,
+            **kwargs: Any
+    ) -> requests.Response:
+        resp = self.client.request(
+            method=method, url=url, proxies=self.proxies, *args, **kwargs
+        )
+        if resp.status_code != 200:
+            log.error(f"Failed to retrieve URL {url}")
+            sys.exit(-1)
+        return resp
+
     @abstractmethod
-    def parse_performer_by_url(self, info: PerformerSearchResult) -> ScrapedPerformer:
+    def parse_performer_by_url(self, info: dict[Literal["url"], str]) -> ScrapedPerformer:
         pass
 
     @abstractmethod
-    async def parse_performer_by_name(self, info: PerformerSearchResult) -> PerformerSearchResult:
+    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> PerformerSearchResult:
         pass

@@ -1,5 +1,6 @@
 import re
 import sys
+from typing import Literal
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -17,16 +18,8 @@ class V2PH(BaseGalleryScraper):
     def __init__(self):
         super().__init__(base_url="https://v2ph.com", http_client="cloudscraper")
 
-    def parse_performer_by_url(self, info: PerformerSearchResult) -> ScrapedPerformer:
-        resp = self.client.get(
-            url=info.get("url"),
-            headers={'accept-language': 'zh-CN,zh;q=0.9'},
-            proxies=self.proxies
-        )
-        if resp.status_code != 200:
-            log.error("Failed to retrieve URL")
-            sys.exit(-1)
-
+    def parse_performer_by_url(self, info: dict[Literal["url"], str]) -> ScrapedPerformer:
+        resp = self.fetch("get", url=info.get("url"), headers={'accept-language': 'zh-CN,zh;q=0.9'})
         soup = BeautifulSoup(resp.content, "html.parser")
 
         info_elem = soup.select_one("div.row.card-body")
@@ -74,17 +67,13 @@ class V2PH(BaseGalleryScraper):
             details=last_text
         )
 
-    async def parse_performer_by_name(self, info: PerformerSearchResult) -> list[PerformerSearchResult]:
-        name = info.get("name", "")
-        resp = self.client.get(
+    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
+        name = info.get("name")
+        resp = self.fetch(
+            "get",
             url=f"https://www.v2ph.com/search/?q={name}",
             headers={'accept-language': 'zh-CN,zh;q=0.9'},
-            proxies=self.proxies
         )
-        if resp.status_code != 200:
-            log.error("Failed to retrieve search results")
-            sys.exit(-1)
-
         soup = BeautifulSoup(resp.content, "html.parser")
 
         result_elem = soup.select_one("div.container.main-wrap")

@@ -19,3 +19,13 @@ performerByName:
     - python
     - main.py
     - performerByName
+
+galleryByURL:
+    action: script
+    url:
+        - xchina.co/gallery
+        - xchina.fit/gallery
+    script:
+        - python
+        - main.py
+        - galleryByURL

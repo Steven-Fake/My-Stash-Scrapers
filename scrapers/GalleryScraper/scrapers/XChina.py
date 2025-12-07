@@ -1,12 +1,13 @@
 import re
 import sys
 from datetime import datetime
+from typing import Literal
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
 from py_common import log
-from py_common.types import ScrapedPerformer, PerformerSearchResult
+from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery, ScrapedTag, ScrapedStudio
 from utils import jaccard_similarity
 from .base import BaseGalleryScraper
 
@@ -17,16 +18,8 @@ class XChina(BaseGalleryScraper):
     def __init__(self):
         super().__init__(base_url="https://xchina.co", http_client="cloudscraper")
 
-    def parse_performer_by_url(self, info: PerformerSearchResult) -> ScrapedPerformer:
-        resp = self.client.get(
-            url=info.get("url"),
-            headers={'accept-language': 'zh-CN,zh;q=0.9'},
-            proxies=self.proxies
-        )
-        if resp.status_code != 200:
-            log.error("Failed to retrieve URL")
-            sys.exit(-1)
-
+    def parse_performer_by_url(self, info: dict[Literal["url"], str]) -> ScrapedPerformer:
+        resp = self.fetch("get", url=info.get("url"), headers={'accept-language': 'zh-CN,zh;q=0.9'})
         soup = BeautifulSoup(resp.content, "html.parser")
 
         info_elem = soup.select_one("div.content-box.object-card")
@@ -50,8 +43,12 @@ class XChina(BaseGalleryScraper):
             for tag_elem in (info_elem.select("div.tag") or [])
             if tag_elem.text.strip() and not tag_elem.text.strip().isdigit()
         ]
-
-        country = "CN" if any(["华人" in t for t in tags]) else None
+        if any(["华人" in t for t in tags]):
+            country = "CN"
+        elif any(["韩国" in t for t in tags]):
+            country = "KR"
+        else:
+            country = None
 
         urls_elem = info_elem.select_one("div.links")
         urls = [link_elem['href'] for link_elem in urls_elem.select("a")] if urls_elem else []
@@ -69,12 +66,6 @@ class XChina(BaseGalleryScraper):
                 birthdate = datetime(int(year), int(month), int(day)).strftime("%Y-%m-%d")
             else:
                 birthdate = None
-
-            # try to find country info
-            if "中国" in details or "大陆" in details:
-                country = "CN"
-            elif "台湾" in details:
-                country = "TW"
         else:
             birthdate = None
 
@@ -89,12 +80,12 @@ class XChina(BaseGalleryScraper):
             tags=[{"name": t} for t in tags],
         )
 
-    async def parse_performer_by_name(self, info: PerformerSearchResult) -> list[PerformerSearchResult]:
-        name = info.get("name", "")
-        resp = self.client.get(
+    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
+        name = info.get("name")
+        resp = self.fetch(
+            "get",
             url=f"https://xchina.co/models/keyword-{name}.html",
-            headers={'accept-language': 'zh-CN,zh;q=0.9'},
-            proxies=self.proxies
+            headers={'accept-language': 'zh-CN,zh;q=0.9'}
         )
         if resp.status_code != 200:
             log.error("Failed to retrieve search results")
@@ -117,3 +108,47 @@ class XChina(BaseGalleryScraper):
         performers.sort(key=lambda p: jaccard_similarity(p.get("name", ""), name), reverse=True)
 
         return performers
+
+    def parse_gallery_by_url(self, info: dict[Literal["url"], str]) -> ScrapedGallery:
+        resp = self.fetch("get", url=info.get("url"), headers={'accept-language': 'zh-CN,zh;q=0.9'})
+        soup = BeautifulSoup(resp.content, "html.parser")
+
+        title_elem = soup.select_one("h1.hero-title-item")
+        title = title_elem.text.strip() if title_elem else ""
+
+        info_elem = soup.select_one("div.tab-contents")
+        if info_elem:
+            # tags
+            tags: list[ScrapedTag] = [
+                ScrapedTag(name=tag_elem.text.strip())
+                for tag_elem in info_elem.select("div.tag")
+                if tag_elem.text.strip()
+            ]
+            # studio
+            studios_elem = info_elem.select('a[href^="/photos/series"]')
+            if len(studios_elem) >= 2:
+                studio_elem = studios_elem[1]
+                studio = ScrapedStudio(
+                    name=studio_elem.text.strip(),
+                    url=urljoin(self.base_url, studio_elem["href"])
+                )
+            else:
+                studio = None
+            # performers
+            performers_elem = info_elem.select("div.model-item")
+            performers = [
+                self.parse_performer_by_url(info={"url": urljoin(self.base_url, p_elem.parent["href"])})
+                for p_elem in performers_elem
+            ]
+        else:
+            tags = []
+            studio = None
+            performers = []
+
+        return ScrapedGallery(
+            title=title,
+            urls=[info.get("url")],
+            tags=tags,
+            studio=studio,
+            performers=performers,
+        )
