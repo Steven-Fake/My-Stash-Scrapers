@@ -36,6 +36,12 @@ class XChina(BaseGalleryScraper):
         image_elem = info_elem.select_one("div.object-avatar img")
         image_url = image_elem['src'] if image_elem else None
 
+        tags = [
+            tag_elem.text.strip()
+            for tag_elem in (info_elem.select("div.tag") or [])
+            if tag_elem.text.strip() and not tag_elem.text.strip().isdigit()
+        ]
+
         urls_elem = info_elem.select_one("div.links")
         urls = [link_elem['href'] for link_elem in urls_elem.select("a")] if urls_elem else []
 
@@ -50,6 +56,7 @@ class XChina(BaseGalleryScraper):
 
         return PerformerByURLOutput(
             name=name,
+            tags=[{"name": t} for t in tags],
             aliases=", ".join(aliases),
             image=image_url,
             birthdate=birthdate,

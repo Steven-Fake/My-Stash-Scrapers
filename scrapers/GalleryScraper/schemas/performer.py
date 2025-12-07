@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, Literal
 
 
 class PerformerByURLInput(TypedDict):
@@ -15,3 +15,4 @@ class PerformerByURLOutput(TypedDict, total=False):
     height: Optional[str]  # cm
     weight: Optional[str]  # kg
     measurements: Optional[str]
+    tags: Optional[list[dict[Literal["name"], str]]]
