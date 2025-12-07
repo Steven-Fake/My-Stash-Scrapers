@@ -23,8 +23,8 @@ performerByName:
 galleryByURL:
     action: script
     url:
-        - xchina.co/gallery
-        - xchina.fit/gallery
+        - xchina.co/photo
+        - xchina.fit/photo
     script:
         - python
         - main.py
