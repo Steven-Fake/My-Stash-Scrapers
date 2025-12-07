@@ -3,11 +3,11 @@ name: GalleryScraper
 performerByURL:
   - action: script
     url:
-      - galleryepic.com/en/coser
-      - galleryepic.com/zh/coser
-      - v2ph.com/actor
-      - xchina.co/model
-      - xchina.fit/model
+      - galleryepic.com/en/coser/
+      - galleryepic.com/zh/coser/
+      - v2ph.com/actor/
+      - xchina.co/model/
+      - xchina.co/actor/
     script:
       - python
       - main.py
@@ -23,8 +23,10 @@ performerByName:
 galleryByURL:
   - action: script
     url:
-      - xchina.co/photo
-      - xchina.fit/photo
+      - galleryepic.com/zh/cosplay/
+      - galleryepic.com/zh/album/
+      - v2ph.com/album/
+      - xchina.co/photo/
     script:
       - python
       - main.py

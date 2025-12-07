@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from bs4.element import NavigableString, Tag
 
 from py_common import log
-from py_common.types import ScrapedPerformer, PerformerSearchResult
+from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery, ScrapedStudio
 from utils import jaccard_similarity
 from .base import BaseGalleryScraper
 
@@ -91,3 +91,44 @@ class V2PH(BaseGalleryScraper):
         performers.sort(key=lambda p: jaccard_similarity(p.get("name", ""), name), reverse=True)
 
         return performers
+
+    def parse_gallery_by_url(self, info: dict[Literal["url"], str]) -> ScrapedGallery:
+        resp = self.fetch("get", url=info.get("url"), headers={'accept-language': 'zh-CN,zh;q=0.9'})
+        soup = BeautifulSoup(resp.content, "html.parser")
+
+        info_elem = soup.select_one("div.container.main-wrap > div.card")
+        if not info_elem:
+            log.error("No gallery info found")
+            sys.exit(-1)
+
+        title_elem = info_elem.select_one("h1.h5.text-center")
+        title = title_elem.text.strip() if title_elem else ""
+
+        keys = [elem.text.strip() for elem in info_elem.select("dt")]
+        values = [elem for elem in info_elem.select("dd")]
+        info_map: dict[str, Tag] = dict(zip(keys, values))
+
+        studio = ScrapedStudio(
+            name=info_map["拍摄机构"].text.strip(),
+            url=urljoin(self.base_url, info_map["拍摄机构"].find("a")['href'])
+        ) if info_map.get("拍摄机构") else None
+        performers: list[ScrapedPerformer] = [
+            self.parse_performer_by_url({"url": urljoin(self.base_url, link_elem['href'])})
+            for link_elem in info_map["出镜模特"].find_all("a")
+        ] if info_map.get("出镜模特") else []
+        date = info_map["发行日期"].text.strip() if info_map.get("发布日期") else None
+        code = info_map["专辑编号"].text.strip() if info_map.get("专辑编号") else None
+        tags = [
+            {"name": tag_elem.text.strip()}
+            for tag_elem in info_map["专辑标签"].find_all("a")
+        ] if info_map.get("专辑标签") else []
+
+        return ScrapedGallery(
+            title=title,
+            urls=[info.get("url")],
+            studio=studio,
+            performers=performers,
+            date=date,
+            code=code,
+            tags=tags
+        )

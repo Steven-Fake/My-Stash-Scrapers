@@ -7,7 +7,7 @@ import cloudscraper
 import requests
 
 from py_common import log
-from py_common.types import ScrapedPerformer, PerformerSearchResult
+from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery
 
 
 class BaseGalleryScraper(ABC):
@@ -52,4 +52,8 @@ class BaseGalleryScraper(ABC):
 
     @abstractmethod
     async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> PerformerSearchResult:
+        pass
+
+    @abstractmethod
+    def parse_gallery_by_url(self, info: dict[Literal["url"], str]) -> ScrapedGallery:
         pass

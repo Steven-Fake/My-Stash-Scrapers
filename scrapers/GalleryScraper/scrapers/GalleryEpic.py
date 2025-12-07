@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from py_common.types import ScrapedPerformer, PerformerSearchResult
+from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery
 from utils import jaccard_similarity
 from .base import BaseGalleryScraper
 
@@ -19,10 +19,10 @@ class GalleryEpic(BaseGalleryScraper):
         soup = BeautifulSoup(resp.content, "html.parser")
 
         name_elem = soup.select_one("h4.scroll-m-20.text-xl.font-semibold.tracking-tight")
-        name = name_elem.text.strip() if name_elem else ""
+        name = name_elem.text.strip() if name_elem else None
 
-        avatar_elem = soup.select_one("img[variant=avatar]")
-        avatar_url = avatar_elem['src'] if avatar_elem else ""
+        image_elem = soup.select_one("img[variant=avatar]")
+        image_url = image_elem['src'] if image_elem else None
 
         urls_elem = soup.select_one("div.flex.items-center.space-x-1.w-0.min-w-full.overflow-x-auto")
         urls = [info.get("url")]
@@ -34,7 +34,7 @@ class GalleryEpic(BaseGalleryScraper):
         return ScrapedPerformer(
             name=name,
             urls=urls,
-            image=avatar_url
+            image=image_url
         )
 
     async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
@@ -57,3 +57,36 @@ class GalleryEpic(BaseGalleryScraper):
         performers.sort(key=lambda p: jaccard_similarity(p.get("name", ""), name), reverse=True)
 
         return performers
+
+    def parse_gallery_by_url(self, info: dict[Literal["url"], str]) -> ScrapedGallery:
+        resp = self.fetch("get", url=info.get("url"))
+        soup = BeautifulSoup(resp.content, "html.parser")
+
+        info_elem = soup.select_one("div.w-full div.flex.justify-between.items-center")
+        if info_elem:
+            info_elem = info_elem.parent
+            title_elem = info_elem.select_one("h2")
+            title = title_elem.text.strip() if title_elem else ""
+        else:
+            title = None
+
+        breadcrumb_elem = soup.select_one("div.w-full > div.py-3")
+        if breadcrumb_elem:
+            performers: list[ScrapedPerformer] = []
+            for link_elem in breadcrumb_elem.select('a[href^="/zh/coser/"]'):
+                url = urljoin(self.base_url, link_elem['href'])
+                name = link_elem.text.strip()
+                if "album" in info.get("url"):
+                    url = url.replace("/coser/", "/model/")  # Fix the wrong performer URL in album pages
+                performer = self.parse_performer_by_url({"url": url})
+                if not performer.get("name"):
+                    performer["name"] = name
+                performers.append(performer)
+        else:
+            performers = []
+
+        return ScrapedGallery(
+            title=title,
+            urls=[info.get("url")],
+            performers=performers
+        )
