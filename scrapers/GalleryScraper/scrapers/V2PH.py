@@ -59,7 +59,7 @@ class V2PH(BaseGalleryScraper):
 
         return PerformerByURLOutput(
             name=name,
-            aliases=",".join(aliases),
+            aliases=", ".join(aliases),
             image=image_url,
             birthdate=birthdate,
             height=height,

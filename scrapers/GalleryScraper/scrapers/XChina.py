@@ -25,8 +25,13 @@ class XChina(BaseGalleryScraper):
         if not info_elem:
             self._logger.error("No performer info found")
 
-        name_elem = info_elem.select_one("div.title")
-        name = name_elem.text.strip() if name_elem else ""
+        name_container_elem = info_elem.select_one("div.title")
+        name = name_container_elem.next.text.strip() if name_container_elem and name_container_elem.next else ""
+        aliases = [
+            alias_elem.text.strip()
+            for alias_elem in (name_container_elem.select("span") or [])
+            if alias_elem.text.strip()
+        ]
 
         image_elem = info_elem.select_one("div.object-avatar img")
         image_url = image_elem['src'] if image_elem else None
@@ -45,6 +50,7 @@ class XChina(BaseGalleryScraper):
 
         return PerformerByURLOutput(
             name=name,
+            aliases=", ".join(aliases),
             image=image_url,
             birthdate=birthdate,
             urls=urls,
