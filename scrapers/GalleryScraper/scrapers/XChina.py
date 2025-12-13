@@ -80,7 +80,7 @@ class XChina(BaseGalleryScraper):
             tags=[{"name": t} for t in tags],
         )
 
-    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
+    def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
         name = info.get("name")
         resp = self.fetch(
             "get",

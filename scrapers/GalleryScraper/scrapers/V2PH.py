@@ -67,7 +67,7 @@ class V2PH(BaseGalleryScraper):
             details=last_text
         )
 
-    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
+    def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
         name = info.get("name")
         resp = self.fetch(
             "get",

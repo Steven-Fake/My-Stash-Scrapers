@@ -37,7 +37,7 @@ class GalleryEpic(BaseGalleryScraper):
             image=image_url
         )
 
-    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
+    def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
         name = info.get("name")
         resp = self.fetch("get", url=f"https://galleryepic.com/zh/cosers/1?coserName={name}")
         soup = BeautifulSoup(resp.content, "html.parser")

@@ -51,7 +51,7 @@ class BaseGalleryScraper(ABC):
         pass
 
     @abstractmethod
-    async def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> PerformerSearchResult:
+    def parse_performer_by_name(self, info: dict[Literal["name"], str]) -> list[PerformerSearchResult]:
         pass
 
     @abstractmethod
