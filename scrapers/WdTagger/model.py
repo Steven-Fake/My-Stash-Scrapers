@@ -1,22 +1,18 @@
 from io import BytesIO
-from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
 import pandas as pd
 from PIL import Image
 
+from config import PREDICT_THRESHOLD, MODEL_PATH, TAG_PATH
+
 
 class WD14Tagger:
-    def __init__(
-            self,
-            model_file: str | Path,
-            tag_file: str | Path,
-            threshold=0.35
-    ):
-        self.model_file = model_file
-        self.tag_file = tag_file
-        self.threshold = threshold
+    def __init__(self):
+        self.model_file = MODEL_PATH
+        self.tag_file = TAG_PATH
+        self.threshold = PREDICT_THRESHOLD
         self.tags_df = None
         self.session = None
 

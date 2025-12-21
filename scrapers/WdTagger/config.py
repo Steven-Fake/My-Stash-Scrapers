@@ -1,3 +1,5 @@
 BASE_URL = "http://127.0.0.1:9999"
 MODEL_PATH = ""
 TAG_PATH = ""
+
+PREDICT_THRESHOLD = 0.35

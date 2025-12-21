@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 import requests
 
-from config import BASE_URL, MODEL_PATH, TAG_PATH
+from config import BASE_URL
 from model import WD14Tagger
 from py_common.graphql import configuration, callGraphQL
 from py_common.types import ScrapedGallery, ScrapedTag
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     ).get("findGallery", {}).get("image_count")
     api_key = config.get("general", {}).get("apiKey")
 
-    model = WD14Tagger(model_file=MODEL_PATH, tag_file=TAG_PATH)
+    model = WD14Tagger()
 
     # choose random 10 images and generate tags
     tags = set()
