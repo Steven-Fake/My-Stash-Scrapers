@@ -1,0 +1,7 @@
+name: WdTagger
+
+galleryByFragment:
+  action: script
+  script:
+    - python
+    - main.py
