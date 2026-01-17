@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from cloudscraper import create_scraper, CloudScraper
 
 from py_common.types import ScrapedPerformer, ScrapedScene, ScrapedStudio, ScrapedTag, SceneSearchResult, \
-    PerformerSearchResult
+    PerformerSearchResult, ScrapedGroup
 
 
 class JavDB:
@@ -102,7 +102,7 @@ class JavDB:
             image = None
 
         # Metadata
-        code, date, studio, tags, performers, urls = None, None, None, [], [], [url]
+        code, date, studio, tags, performers, urls, groups = None, None, None, [], [], [url], []
         metadata_container_elem = soup.select_one("nav.panel.movie-panel-info")
         if metadata_container_elem:
             metadata_elems = metadata_container_elem.select("div.panel-block")
@@ -115,8 +115,10 @@ class JavDB:
                 elif re.search("片商:.+", text):
                     studio_name = info.select_one("span.value").text
                     studio = ScrapedStudio(name=studio_name.strip())
-                elif re.search("系列:.+", text):  # TODO
-                    pass
+                elif re.search("系列:.+", text):
+                    group_name = info.select_one("a").text.strip()
+                    group_url = urljoin(self.base_url, info.select_one("a")["href"])
+                    groups.append(ScrapedGroup(name=group_name, url=group_url))
                 elif re.search("類別:.+", text):
                     tags_container = info.select_one("span.value")
                     for tag in tags_container.select("a"):
@@ -160,5 +162,6 @@ class JavDB:
             studio=studio,
             tags=tags,
             performers=performers,
-            urls=urls
+            urls=urls,
+            groups=groups
         )
