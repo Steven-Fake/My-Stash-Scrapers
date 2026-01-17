@@ -7,7 +7,7 @@ from py_common.deps import ensure_requirements
 from py_common.types import ScrapedScene, SceneSearchResult, PerformerSearchResult, ScrapedPerformer
 from scraper import JavDB
 
-ensure_requirements("bs4:beautifulsoup4", "requests")
+ensure_requirements("beautifulsoup4", "requests", "cloudscraper")
 
 
 def scene_by_url(url_info: dict[Literal["url"], str]) -> ScrapedScene:

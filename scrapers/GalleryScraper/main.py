@@ -10,7 +10,7 @@ from py_common.types import ScrapedPerformer, PerformerSearchResult
 from scrapers import GalleryEpic, V2PH, XChina, MissKon, EHentai
 from utils import jaccard_similarity
 
-ensure_requirements("bs4:beautifulsoup4", "requests")
+ensure_requirements("beautifulsoup4", "requests", "cloudscraper")
 
 all_scrapers = [
     GalleryEpic, V2PH, XChina, MissKon, EHentai
