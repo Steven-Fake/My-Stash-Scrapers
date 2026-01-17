@@ -5,7 +5,7 @@ from typing import Literal, Optional
 from py_common import log
 from py_common.deps import ensure_requirements
 from py_common.types import ScrapedScene, SceneSearchResult, PerformerSearchResult, ScrapedPerformer
-from .scraper import JavDB
+from scraper import JavDB
 
 ensure_requirements("bs4:beautifulsoup4", "requests", "cloudscraper")
 

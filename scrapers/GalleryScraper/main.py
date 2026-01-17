@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 from py_common import log
 from py_common.deps import ensure_requirements
 from py_common.types import ScrapedPerformer, PerformerSearchResult
-from .scrapers import GalleryEpic, V2PH, XChina, MissKon, EHentai
+from scrapers import GalleryEpic, V2PH, XChina, MissKon, EHentai
 from utils import jaccard_similarity
 
 ensure_requirements("bs4:beautifulsoup4", "requests", "cloudscraper")
