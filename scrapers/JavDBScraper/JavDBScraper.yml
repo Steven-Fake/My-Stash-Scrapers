@@ -1,0 +1,40 @@
+name: JavDBScraper
+
+sceneByURL:
+  - action: script
+    url:
+      - javdb.com/v/
+    script:
+      - python
+      - main.py
+      - sceneByURL
+
+sceneByName:
+  action: script
+  script:
+    - python
+    - main.py
+    - sceneByName
+
+sceneByFragment:
+  action: script
+  script:
+    - python
+    - main.py
+    - sceneByFragment
+
+performerByURL:
+  - action: script
+    url:
+      - https://javdb.com/actors/
+    script:
+      - python
+      - main.py
+      - performerByURL
+
+performerByName:
+  action: script
+  script:
+    - python
+    - main.py
+    - performerByName
