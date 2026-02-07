@@ -10,7 +10,7 @@ from .base import BaseGalleryScraper
 
 
 class JVID(BaseGalleryScraper):
-    domain = ["jvid.com"]
+    domain = ["jvid.com", "www.jvid.com"]
 
     def __init__(self):
         super().__init__(base_url="https://www.jvid.com")
