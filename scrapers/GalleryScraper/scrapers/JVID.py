@@ -33,13 +33,8 @@ class JVID(BaseGalleryScraper):
 
         if info_elem := soup.select_one("div.product_info"):
             if details_elem := info_elem.select_one("div.product_description p"):
-                details_list = []
-                for line in details_elem.select("span, br"):
-                    if line.name == "span":
-                        details_list.append(line.text.strip())
-                    elif line.name == "br":
-                        details_list.append("\n")
-                details = "".join(details_list).strip()
+                text_list = details_elem.stripped_strings
+                details = "\n".join(text_list).strip()
 
             if time_elem := info_elem.select_one("div.dateStart"):
                 if search_result := re.search(r"(\d{4} / \d{2} / \d{2})", time_elem.text.strip()):
