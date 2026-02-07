@@ -52,7 +52,9 @@ class JVID(BaseGalleryScraper):
             ]
 
         if members_elem := soup.select_one("div.member"):
-            for performer_elem in members_elem.select("div.model_part"):
+            performer_count = len(members_elem.select("div.model_part a.model_person"))
+            if performer_count == 1:
+                performer_elem = members_elem.select_one("div.model_part")
                 performers.append(ScrapedPerformer(
                     name=performer_elem.select_one("p.person_name").text.strip(),
                     images=[performer_elem.select_one("img").get("src")]
@@ -61,6 +63,8 @@ class JVID(BaseGalleryScraper):
                         urljoin(self.base_url, performer_elem.select_one("a.model_person").get("href"))
                     ] if performer_elem.select_one("a.model_person") else []
                 ))
+            else:  # Can not get performer name without javascript
+                pass
             if producer_elem := members_elem.select_one("div.author_part"):
                 photographer = producer_elem.select_one("p").text.strip()
 
