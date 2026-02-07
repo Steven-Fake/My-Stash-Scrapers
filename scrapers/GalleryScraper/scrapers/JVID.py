@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup as Soup
 
 from py_common import log as log
-from py_common.types import ScrapedGallery, PerformerSearchResult, ScrapedPerformer
+from py_common.types import ScrapedGallery, PerformerSearchResult, ScrapedPerformer, ScrapedTag
 from .base import BaseGalleryScraper
 
 
@@ -39,7 +39,11 @@ class JVID(BaseGalleryScraper):
                 if search_result := re.search(r"(\d{4} / \d{2} / \d{2})", time_elem.text.strip()):
                     date = search_result.group(1).replace(" / ", "-")
             tags_elem = info_elem.select("li.mr-8px")
-            tags = [tag.text.strip().removeprefix("#") for tag in tags_elem if tag.text.strip()]
+            tags = [
+                ScrapedTag(name=tag.text.strip().removeprefix("#"))
+                for tag in tags_elem
+                if tag.text.strip()
+            ]
 
         if members_elem := soup.select_one("div.member"):
             for performer_elem in members_elem.select("div.model_part"):
