@@ -29,6 +29,7 @@ galleryByURL:
       - misskon.com/
       - v2ph.com/album/
       - xchina.co/photo/
+      - jvid.com/v/
     script:
       - python
       - main.py
