@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup as Soup
 
 from py_common import log as log
-from py_common.types import ScrapedGallery, PerformerSearchResult, ScrapedPerformer, ScrapedTag
+from py_common.types import ScrapedGallery, PerformerSearchResult, ScrapedPerformer, ScrapedTag, ScrapedStudio
 from .base import BaseGalleryScraper
 
 
@@ -61,6 +61,7 @@ class JVID(BaseGalleryScraper):
         return ScrapedGallery(
             title=title,
             details=details,
+            studio=ScrapedStudio(name="JVID"),
             date=date,
             tags=tags,
             performers=performers,
