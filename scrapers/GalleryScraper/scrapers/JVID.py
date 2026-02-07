@@ -32,10 +32,16 @@ class JVID(BaseGalleryScraper):
             title = title_elem.text.strip() if title_elem else ""
 
         if info_elem := soup.select_one("div.product_info"):
-            details_elem = info_elem.select_one("div.product_description")
-            details = details_elem.text.strip() if details_elem else ""
-            time_elem = info_elem.select_one("div.dateStart")
-            if time_elem:
+            if details_elem := info_elem.select_one("div.product_description p"):
+                details_list = []
+                for line in details_elem.select("span, br"):
+                    if line.name == "span":
+                        details_list.append(line.text.strip())
+                    elif line.name == "br":
+                        details_list.append("\n")
+                details = "".join(details_list).strip()
+
+            if time_elem := info_elem.select_one("div.dateStart"):
                 if search_result := re.search(r"(\d{4} / \d{2} / \d{2})", time_elem.text.strip()):
                     date = search_result.group(1).replace(" / ", "-")
             tags_elem = info_elem.select("li.mr-8px")
