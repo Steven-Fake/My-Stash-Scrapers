@@ -1,8 +1,10 @@
 from typing import Literal
 from urllib.parse import urlparse, urljoin
+
 from bs4 import BeautifulSoup
+
 from py_common import log as log
-from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery, ScrapedStudio
+from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery
 from .base import BaseGalleryScraper
 
 
