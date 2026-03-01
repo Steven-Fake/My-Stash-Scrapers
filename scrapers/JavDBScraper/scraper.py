@@ -9,7 +9,7 @@ from cloudscraper import create_scraper, CloudScraper
 
 from py_common.types import ScrapedPerformer, ScrapedScene, ScrapedStudio, ScrapedTag, SceneSearchResult, \
     PerformerSearchResult, ScrapedGroup
-from .browser import StealthPlaywright
+from browser import StealthPlaywright
 
 
 class JavDB:
