@@ -3,11 +3,11 @@ import sys
 from typing import Literal, Optional
 
 from py_common import log
-from py_common.deps import ensure_requirements
 from py_common.types import ScrapedScene, SceneSearchResult, PerformerSearchResult, ScrapedPerformer
 from scraper import JavDB
 
-ensure_requirements("bs4:beautifulsoup4", "requests", "cloudscraper", "playwright", "playwright-stealth")
+
+# ensure_requirements("bs4:beautifulsoup4", "requests", "cloudscraper", "playwright", "playwright-stealth")
 
 
 def scene_by_url(url_info: dict[Literal["url"], str]) -> ScrapedScene:

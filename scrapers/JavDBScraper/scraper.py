@@ -135,7 +135,7 @@ class JavDB:
                         performer_url = urljoin(self.base_url, actor["href"])
                         performer = self.parse_performer(performer_url)
                         if not performer.get("name"):
-                            performer.name = performer_name
+                            performer["name"] = performer_name
                         performers.append(performer)
                 elif info.select_one("div.control.ranking-tags"):
                     for tag in info.select("a.tags"):
