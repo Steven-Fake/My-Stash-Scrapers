@@ -1,4 +1,4 @@
-name: Pornhub
+name: PornhubCNScraper
 performerByURL:
   - action: scrapeXPath
     url:
