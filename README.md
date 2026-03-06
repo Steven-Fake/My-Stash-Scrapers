@@ -14,7 +14,13 @@
 | [V2PH](https://v2ph.com)               | √              | √                 | √                |
 | [XChina](https://xchina.co)            | √              | √                 | √                |
 
-## JavScraper
+## JavDBScraper
+
+> Scraper info from [JavDB](https://javdb.com). Using `playwright` to escape anti-scraping measures.
+
+## PornhubCNScraper
+
+> Simply modify from [Pornhub Scraper](https://github.com/stashapp/CommunityScrapers/tree/master/scrapers/Pornhub), using the Chinese Pornhub site `cn.pornhub.com`.
 
 ## WdTagger
 
