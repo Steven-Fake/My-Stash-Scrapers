@@ -1,0 +1,8 @@
+name: Translator
+
+sceneByFragment:
+  action: script
+  script:
+    - python
+    - main.py
+    - sceneByFragment
