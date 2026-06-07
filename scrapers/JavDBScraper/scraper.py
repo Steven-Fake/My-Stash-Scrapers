@@ -5,9 +5,9 @@ from urllib.parse import urljoin
 import unicodedata
 from bs4 import BeautifulSoup
 
+from fetcher import fetch_html
 from py_common.types import ScrapedPerformer, ScrapedScene, ScrapedStudio, ScrapedTag, SceneSearchResult, \
     PerformerSearchResult, ScrapedGroup
-from .fetcher import fetch_html
 
 
 class JavDB:
