@@ -1,28 +1,21 @@
-import asyncio
 import re
 from typing import Optional
 from urllib.parse import urljoin
-import urllib.request
-import requests
+
 import unicodedata
 from bs4 import BeautifulSoup
 
 from py_common.types import ScrapedPerformer, ScrapedScene, ScrapedStudio, ScrapedTag, SceneSearchResult, \
     PerformerSearchResult, ScrapedGroup
+from .fetcher import fetch_html
 
 
 class JavDB:
     base_url = "https://javdb.com"
 
-    def __init__(self):
-        proxies = urllib.request.getproxies()
-        if 'http' in proxies and 'https' not in proxies:
-            proxies['https'] = proxies['http']
-        self.proxies = proxies
-
     def fetch_soup(self, url: str) -> BeautifulSoup:
-        resp = requests.get(url=url, proxies=self.proxies)
-        soup = BeautifulSoup(resp.text or '')
+        html = fetch_html(url=url, source="JINA")
+        soup = BeautifulSoup(html, features="html.parser")
         return soup
 
     def search_scenes(self, keyword: str) -> list[SceneSearchResult]:
