@@ -2,30 +2,27 @@ import asyncio
 import re
 from typing import Optional
 from urllib.parse import urljoin
-
+import urllib.request
+import requests
 import unicodedata
 from bs4 import BeautifulSoup
-from cloudscraper import create_scraper, CloudScraper
 
 from py_common.types import ScrapedPerformer, ScrapedScene, ScrapedStudio, ScrapedTag, SceneSearchResult, \
     PerformerSearchResult, ScrapedGroup
-from browser import StealthPlaywright
 
 
 class JavDB:
     base_url = "https://javdb.com"
 
     def __init__(self):
-        self.client: CloudScraper = create_scraper()
-
-    @staticmethod
-    async def _fetch_soup(url: str) -> BeautifulSoup:
-        async with StealthPlaywright() as sp:
-            soup = await sp.fetch_soup(url)
-        return soup
+        proxies = urllib.request.getproxies()
+        if 'http' in proxies and 'https' not in proxies:
+            proxies['https'] = proxies['http']
+        self.proxies = proxies
 
     def fetch_soup(self, url: str) -> BeautifulSoup:
-        soup = asyncio.run(self._fetch_soup(url))
+        resp = requests.get(url=url, proxies=self.proxies)
+        soup = BeautifulSoup(resp.text or '')
         return soup
 
     def search_scenes(self, keyword: str) -> list[SceneSearchResult]:
