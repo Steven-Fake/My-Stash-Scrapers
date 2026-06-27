@@ -32,7 +32,7 @@ class JVID(BaseGalleryScraper):
             title = title_elem.text.strip() if title_elem else ""
 
         if info_elem := soup.select_one("div.product_info"):
-            if details_elem := info_elem.select_one("div.product_description p"):
+            if details_elem := info_elem.select_one("div.product_description"):
                 text_list = details_elem.stripped_strings
                 details = "\n".join(text_list).strip()
 
