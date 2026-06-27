@@ -28,7 +28,7 @@ class JVID(BaseGalleryScraper):
         resp = self.fetch("get", url=info.get("url"))
         soup = Soup(resp.text, "html.parser")
 
-        if title_elem := soup.select_one("h1.headline_people"):
+        if title_elem := soup.select_one(".headline_people"):
             title = title_elem.text.strip() if title_elem else ""
 
         if info_elem := soup.select_one("div.product_info"):

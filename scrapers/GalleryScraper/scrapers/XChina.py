@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from py_common import log
 from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery, ScrapedTag, ScrapedStudio
-from utils import jaccard_similarity
+from ..utils import jaccard_similarity
 from .base import BaseGalleryScraper
 
 
