@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from py_common.types import ScrapedPerformer, PerformerSearchResult, ScrapedGallery
-from ..utils import jaccard_similarity
+from utils import jaccard_similarity
 from .base import BaseGalleryScraper
 
 
